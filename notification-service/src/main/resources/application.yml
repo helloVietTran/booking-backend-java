@@ -1,0 +1,27 @@
+server:
+    port: 8082
+    servlet:
+        context-path: /notification
+
+spring:
+    application:
+        name: notificationservice
+    data:
+        mongodb:
+            uri: mongodb+srv://root:root@cluster0.dslk0oo.mongodb.net/notification-database?retryWrites=true&w=majority
+    kafka:
+        bootstrap-servers: localhost:9094
+        consumer:
+            group-id: notification-group
+            auto-offset-reset: earliest
+            key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+            properties:
+                spring.json.trusted.packages: "*"
+
+brevo:
+    apiKey: "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"
+    url: https://api.brevo.com
+
+web:
+    url: http://localhost:3000

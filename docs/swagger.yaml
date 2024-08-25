@@ -1,0 +1,1006 @@
+openapi: 3.0.3
+info:
+  title: Booking project
+  description: |-
+   
+  contact:
+    email: tranhdanhviet192003@gmail.com
+  version: 1.0.11
+servers:
+  - url: http://localhost:8000
+tags:
+  - name: user
+    description: Quản lý người dùng
+  - name: auth
+    description: Xác thực người dùng
+  - name: listing
+    description: Quản lý các phòng cho thuê
+  - name: file
+    description: Quản lý tất cả hoạt động upload
+paths:
+  /identity/auth/login:
+    post:
+      tags:
+        - auth
+      summary: Đảm nhận đăng nhập thường của người dùng
+      operationId: login
+      requestBody:
+         content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/LoginRequest'
+         required: true
+      responses:
+        '200': 
+          description: Thành công
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/AuthenticationResponse'
+  /identity/auth/refresh:
+      post:
+        tags:
+          - auth
+        summary: Đảm nhận việc lấy token mới khi hết hạn
+        operationId: refreshToken
+        requestBody:
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/RefreshRequest'
+          required: true
+        responses:
+          '200': 
+            description: Thành công, còn các code khác là thất bại
+            content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/AuthenticationResponse'
+  /identity/auth/logout:
+     post:
+        tags:
+          - auth
+        summary: Xử lí đăng xuất
+        operationId: logout
+        requestBody:
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/LogoutRequest'
+          required: true
+        responses:
+          '200': 
+            description: Thành công, không có giá trị trả về  
+  /identity/auth/send-link-login :
+      post:
+        tags:
+          - auth
+        summary: gửi link đăng nhập
+        operationId: sendLinkLogin
+        requestBody:
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/SendLinkLoginRequest'
+          required: true
+        responses:
+          '200': 
+            description: Thành công, không có giá trị trả về  
+  /identity/auth/verify-login-link:
+      post:
+        tags:
+          - auth
+        summary: Xác thực link đăng nhập
+        operationId: verifyLinkLogin
+        requestBody:
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/VerifyLoginLinkRequest'
+          required: true
+        responses:
+          '200': 
+            content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/AuthenticationResponse'
+            description: Thành công
+
+  /identity/users/registration:
+      post:
+        tags:
+          - user
+        summary: Đăng kí user mới
+        operationId: createUser
+        requestBody:
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/UserCreationRequest'
+          required: true
+        responses:
+          '200': 
+            content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/AuthenticationResponse'
+            description: Thành công
+  /identity/users/{userId}:
+      get:
+        tags:
+          - user
+        summary: Lấy một user bằng userId
+        operationId: getOneUser
+        responses:
+          '200': 
+            content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/UserResponse'
+            description: Thành công 
+  /identity/users/my-info:
+      get:
+        tags:
+          - user
+        summary: Lấy user của chính người dùng
+        operationId: getMyInfo
+        responses:
+          '200': 
+            content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/UserResponse'
+            description: Thành công 
+
+  /identity/users/my:
+      delete:
+        tags:
+          - user
+        summary: Xóa tài khoản của chính người dùng
+        operationId: deleteMyAccount
+        responses:
+          '200': 
+            description: Thành công, không có giá trị trả về  
+
+  /identity/users/reset-password:
+      post:
+        tags:
+            - user
+        summary: Reset mật khẩu
+        operationId: resetPassword
+        responses:
+          '200': 
+            description: Thành công, không có giá trị trả về, link được gửi qua gmail  
+
+  /identity/users/change-password:
+    patch:
+          tags:
+            - user
+          summary: Đổi mật khẩu
+          operationId: changePassword
+          requestBody:
+            content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/ChangePasswordRequest'
+            
+          responses:
+            '200': 
+              description: Thành công, không có giá trị trả về, link được gửi qua gmail  
+  /listing/new-listing:
+    post:
+          tags:
+            - listing
+          summary: Đổi mật khẩu
+          operationId: createListing
+          requestBody:
+            content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/ListingCreationRequest'
+            
+          responses:
+            '200': 
+              content:
+                application/json:
+                  schema: 
+                    $ref: '#/components/schemas/ListingResponse'
+              description: Thành công
+
+  /listing/my/delte/{listingId}:
+      delete:
+        tags:
+          - listing
+        summary: Xóa nhà cho thuê của chính người dùng
+        operationId: deleteMyListing
+        responses:
+          '200': 
+            description: Thành công, không có giá trị trả về  
+  /listing/{listingId}:
+      get:
+        tags:
+          - listing
+        summary: Lấy một nhà cho thuê bằng id
+        operationId: getListing
+        responses:
+          '200': 
+            content:
+              application/json:
+                  schema: 
+                    $ref: '#/components/schemas/ListingResponse'
+            description: Thành công
+  /listing/my-listing:
+      get:
+        tags:
+          - listing
+        summary: Lấy danh sách nhà của tôi
+        operationId: getMyListingsByPage
+        responses:
+          '200': 
+            content:
+              application/json:
+                  schema: 
+                    $ref: '#/components/schemas/ListingResponse'
+            description: |-
+              Thành công
+              Chú ý định dạng được trả về
+
+  /listing/top-10:
+      get:
+        tags:
+          - listing
+        summary: Lấy 10 nhà ngon nhất dựa vào số đánh giá và lượt bình luận
+        operationId: getTop10
+        responses:
+          '200': 
+            content:
+              application/json:
+                  schema: 
+                    $ref: '#/components/schemas/ListingResponse'
+            description: |-
+              Thành công
+  /listing/listing-type:
+       get:
+        tags:
+          - listing
+        summary: Lấy tất cả các thể loại nhà
+        operationId: getAllListingType
+        responses:
+          '200': 
+            content:
+              application/json:
+                  schema: 
+                    $ref: '#/components/schemas/ListingTypeResponse'
+            description: |-
+              Thành công
+  /listing/search:
+   get:
+      summary: "Tìm kiếm phòng theo các tiêu chí"
+      tags:
+        - listing
+      operationId: searchListing
+      parameters:
+        - name: city
+          in: query
+          required: true
+          schema:
+            type: string
+          description: "Tên thành phố để tìm kiếm phòng."
+          example: "Hanoi"
+
+        - name: checkin
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: "Thời gian nhận phòng (theo định dạng ISO 8601)."
+          example: "2024-09-01T15:00:00Z"
+
+        - name: checkout
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: "Thời gian trả phòng (theo định dạng ISO 8601)."
+          example: "2024-09-10T11:00:00Z"
+
+        - name: adult_count
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: "Số lượng người lớn."
+          example: 2
+
+        - name: children_count
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: "Số lượng trẻ em."
+          example: 1
+
+        - name: room_count
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: "Số lượng phòng."
+          example: 1
+
+        - name: min_price
+          in: query
+          required: false
+          schema:
+            type: number
+            format: float
+          description: "Giá tối thiểu mỗi đêm."
+          example: 500.492
+
+        - name: max_price
+          in: query
+          required: false
+          schema:
+            type: number
+            format: float
+          description: "Giá tối đa mỗi đêm."
+          example: 500.900
+
+        - name: amenities
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          description: "Danh sách các tiện nghi yêu cầu."
+          example: ["Wi-Fi", "Parking"]
+
+        - name: min_rating
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: "Điểm đánh giá tối thiểu."
+          example: 4
+
+        - name: bedroom_count
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: "Số lượng phòng ngủ."
+          example: 2
+
+        - name: bathroom_count
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: "Số lượng phòng tắm."
+          example: 1
+
+        - name: des_type
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          description: "Danh sách các loại danh sách phòng."
+          example: ["Apartment", "Villa"]
+
+        - name: mealplan
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: "Có cung cấp bữa sáng không."
+          example: true
+
+      responses:
+        '200':
+          description: "Danh sách phòng tìm được."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ListingResponse'
+        '400':
+          description: "Yêu cầu không hợp lệ."
+  /listing/search/recent-search:
+     get:
+        tags:
+          - listing
+        summary: Lấy tìm kiếm gần nhất
+        operationId: getRecentSearch
+        responses:
+          '200': 
+            content:
+              application/json:
+                  schema: 
+                    $ref: '#/components/schemas/RecentSearchResponse'
+            description: |-
+              Thành công
+  /files/avatar/upload:
+     post:
+      tags:
+        - file
+      operationId:  uploadAvatar
+      summary: Tải ảnh đại diện
+      description: Tải ảnh đại diện lên và thêm thông tin mô tả.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                tag:
+                  type: string
+                  description: Thẻ hoặc nhãn cho ảnh
+                description:
+                  type: string
+                  description: Mô tả cho ảnh
+                file:
+                  type: string
+                  format: binary
+                  description: Tệp ảnh để tải lên
+              required:
+                - file
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '500':
+          description: Lỗi máy chủ
+  /file/listing/upload:
+     post:
+      tags:
+        - file
+      operationId: uploadListingImg
+      summary: Tải lên nhiều tệp ảnh
+      description: Tải lên nhiều tệp ảnh cùng một lúc và thêm thông tin mô tả nếu cần.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                tag:
+                  type: string
+                  description: Thẻ hoặc nhãn cho ảnh
+                description:
+                  type: string
+                  description: Mô tả cho ảnh
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: Danh sách các tệp ảnh để tải lên
+              required:
+                - files
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '500':
+          description: Lỗi máy chủ
+
+      
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+          - email
+          - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: NguyenVanA@gmail.com
+        password:
+          type: string
+          example: abc12345678
+          description: dài 8-20 kí tự ,bao gồm chữ và số và không có kí tự đặc biệt
+    AuthenticationResponse:
+       type: object
+       properties:
+        token:
+          type: string
+          example: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJudW1iZXJ6ZXJvMDkwOUBnbWFpbC5jb20iLCJzY29wZSI6IlJPTEVfQURNSU4g(rất dài)
+        isAuthenticated:
+          type: boolean
+          example: true
+          description: true là được xác thực, false là không
+    IntrospectResponse:
+     type: object
+     properties:
+        isValid:
+          type: boolean
+          example: false
+          description: true là token hợp lệ, false là không
+    RefreshRequest:
+     type: object
+     required:
+       - token
+     properties:
+        token:
+          type: string 
+          example: false
+          description: lấy token từ cookie để gửi lên server
+    LogoutRequest:
+      type: object
+      required:
+        - token
+      properties:
+          token:
+            type: string 
+            example: false
+            description: lấy token từ cookie để gửi lên server
+    SendLinkLoginRequest:
+       required:
+         - email
+       properties:
+        email:
+          type: string 
+          format: email
+          example: NguyenVanA@gmail.com
+          description: gửi mail để server gửi link đăng nhập
+    VerifyLoginLinkRequest:
+        type: object
+        properties:
+          email:
+            type: string 
+            format: email
+            example: NguyenVanA@gmail.com
+            description: lưu tạm email từ bước nhập email để gửi link đăng nhập localstorage, có thể cải tiến trong tương lai
+          token:
+            type: string 
+            example: shdjje-angyeerr-jjsu4j2=jsry4
+            description: token này được lấy từ param, có thể cải tiến trong tương lai
+      
+    UserCreationRequest:
+      required:
+        - email
+        - password
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          description: |
+            Địa chỉ email của người dùng. 
+            - Phải là một địa chỉ email hợp lệ.
+            - Ví dụ: "user@example.com"
+          example: "user@example.com"
+        password:
+          type: string
+          description: |
+            Mật khẩu của người dùng. 
+            - Phải có ít nhất 6 ký tự và tối đa 20 ký tự.
+            - Phải bao gồm chữ và số.
+            - Không chứa ký tự đặc biệt.
+            - Ví dụ: "yourPassword123"
+          example: "yourPassword123"
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: "ID của người dùng."
+          example: "12345"
+        email:
+          type: string
+          format: email
+          description: "Địa chỉ email của người dùng."
+          example: "user@example.com"
+        fullName:
+          type: string
+          description: "Họ và tên đầy đủ của người dùng."
+          example: "Nguyen Van A"
+        displayName:
+          type: string
+          description: "Tên hiển thị của người dùng trên app."
+          example: "NguyenA"
+        isVerified:
+          type: boolean
+          description: "Trạng thái xác thực của người dùng."
+          example: true
+        lastLogin:
+          type: string
+          format: date-time
+          description: "Thời gian lần đăng nhập gần nhất của người dùng."
+          example: "2024-08-25T14:30:00Z"
+        createdAt:
+          type: string
+          format: date-time
+          description: "Thời gian người dùng được tạo."
+          example: "2024-01-15T09:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: "Thời gian người dùng được cập nhật lần cuối."
+          example: "2024-08-25T15:00:00Z"
+        roles:
+          type: array
+          description: "Danh sách vai trò của người dùng, có dạng mảng string."
+
+    ChangePasswordRequest:
+      type: object
+      properties:
+        token:
+          type: string
+          description: "Token đăng nhập"
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        password:
+          type: string
+          description: |
+            Mật khẩu mới của người dùng.
+            - Phải có ít nhất 6 ký tự và tối đa 20 ký tự.
+            - Bao gồm chữ và số.
+            - Không chứa ký tự đặc biệt.
+          example: "newPassword123"
+          minLength: 6
+          maxLength: 20
+        confirmPassword:
+          type: string
+          description: |
+            Xác nhận mật khẩu mới.
+            - Phải giống với mật khẩu mới.
+          example: "newPassword123"
+      required:
+        - token
+        - password
+        - confirmPassword
+      additionalProperties: false
+      
+    ListingStatus:
+      type: string
+      description: "Trạng thái của danh sách phòng."
+      enum:
+        - AVAILABLE
+        - UNAVAILABLE
+        - PENDING
+      example: "AVAILABLE"
+
+    ListingCreationRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          description: "Tiêu đề của danh sách phòng."
+          example: "Cozy Beachfront Villa"
+        description:
+          type: string
+          description: "Mô tả chi tiết về danh sách phòng."
+          example: "A beautiful beachfront villa with stunning ocean views."
+        address:
+          type: string
+          description: "Địa chỉ của danh sách phòng."
+          example: "123 Beach Road, Malibu"
+        city:
+          type: string
+          description: "Thành phố nơi danh sách phòng tọa lạc."
+          example: "Malibu"
+        pricePerNight:
+          type: number
+          format: double
+          description: "Giá thuê mỗi đêm của danh sách phòng."
+          example: 150.0
+        listingTypeId:
+          type: string
+          description: "ID loại danh sách phòng."
+          example: "villa"
+        bedroomsCount:
+          type: integer
+          description: "Số phòng ngủ trong danh sách phòng."
+          example: 3
+        bathroomsCount:
+          type: integer
+          description: "Số phòng tắm trong danh sách phòng."
+          example: 2
+        guestsCount:
+          type: integer
+          description: "Số lượng khách tối đa có thể lưu trú."
+          example: 6
+        amenities:
+          type: array
+          items:
+            type: string
+          description: "Danh sách các tiện nghi có sẵn trong danh sách phòng."
+          example:
+            - "WiFi"
+            - "Air conditioning"
+            - "Swimming pool"
+        imgSrcs:
+          type: array
+          items:
+            type: string
+            format: uri
+          description: "Danh sách các URL hình ảnh của danh sách phòng."
+          example:
+            - "http://example.com/image1.jpg"
+            - "http://example.com/image2.jpg"
+        hasBreakfast:
+          type: boolean
+          description: "Có cung cấp bữa sáng không."
+          example: true
+        hasParking:
+          type: boolean
+          description: "Có chỗ đậu xe không."
+          example: true
+        isChildFriendly:
+          type: boolean
+          description: "Danh sách phòng có phù hợp cho trẻ em không."
+          example: true
+        area:
+          type: integer
+          description: "Diện tích của danh sách phòng (theo mét vuông)."
+          example: 120
+        generalRules:
+          type: array
+          items:
+            type: string
+          description: "Danh sách các quy tắc chung áp dụng cho danh sách phòng."
+          example:
+            - "No smoking"
+            - "No pets allowed"
+        checkinTime:
+          type: string
+          format: date-time
+          description: "Thời gian nhận phòng sớm nhất."
+          example: "2024-08-25T15:00:00Z"
+        checkoutTime:
+          type: string
+          format: date-time
+          description: "Thời gian trả phòng muộn nhất."
+          example: "2024-08-26T11:00:00Z"
+  
+       
+      additionalProperties: false
+
+    ListingResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: "ID của danh sách phòng."
+          example: "listing123"
+        ownerId:
+          type: string
+          description: "ID của người sở hữu danh sách phòng."
+          example: "owner456"
+        title:
+          type: string
+          description: "Tiêu đề của danh sách phòng."
+          example: "Cozy Beachfront Villa"
+        description:
+          type: string
+          description: "Mô tả chi tiết về danh sách phòng."
+          example: "A beautiful beachfront villa with stunning ocean views."
+        address:
+          type: string
+          description: "Địa chỉ của danh sách phòng."
+          example: "123 Beach Road, Malibu"
+        city:
+          type: string
+          description: "Thành phố nơi danh sách phòng tọa lạc."
+          example: "Malibu"
+        state:
+          type: string
+          description: "Tiểu bang hoặc khu vực nơi danh sách phòng tọa lạc."
+          example: "CA"
+        pricePerNight:
+          type: number
+          format: double
+          description: "Giá thuê mỗi đêm của danh sách phòng."
+          example: 150.0
+        listingType:
+          type: string
+          description: "Loại danh sách phòng."
+          example: "villa"
+        bedroomsCount:
+          type: integer
+          description: "Số phòng ngủ trong danh sách phòng."
+          example: 3
+        bathroomsCount:
+          type: integer
+          description: "Số phòng tắm trong danh sách phòng."
+          example: 2
+        guestsCount:
+          type: integer
+          description: "Số lượng khách tối đa có thể lưu trú."
+          example: 6
+        amenities:
+          type: array
+          items:
+            type: string
+          description: "Danh sách các tiện nghi có sẵn trong danh sách phòng."
+          example:
+            - "WiFi"
+            - "Air conditioning"
+            - "Swimming pool"
+        imgSrcs:
+          type: array
+          items:
+            type: string
+            format: uri
+          description: "Danh sách các URL hình ảnh của danh sách phòng."
+          example:
+            - "http://example.com/image1.jpg"
+            - "http://example.com/image2.jpg"
+        status:
+          $ref: '#/components/schemas/ListingStatus'
+          description: "Trạng thái hiện tại của danh sách phòng."
+        hasBreakfast:
+          type: boolean
+          description: "Có cung cấp bữa sáng không."
+          example: true
+        hasParking:
+          type: boolean
+          description: "Có chỗ đậu xe không."
+          example: true
+        isChildFriendly:
+          type: boolean
+          description: "Danh sách phòng có phù hợp cho trẻ em không."
+          example: true
+        area:
+          type: integer
+          description: "Diện tích của danh sách phòng (theo mét vuông)."
+          example: 120
+        generalRules:
+          type: array
+          items:
+            type: string
+          description: "Danh sách các quy tắc chung áp dụng cho danh sách phòng."
+          example:
+            - "No smoking"
+            - "No pets allowed"
+        checkinTime:
+          type: string
+          format: date-time
+          description: "Thời gian nhận phòng sớm nhất."
+          example: "2024-08-25T15:00:00Z"
+        checkoutTime:
+          type: string
+          format: date-time
+          description: "Thời gian trả phòng muộn nhất."
+          example: "2024-08-26T11:00:00Z"
+        ratingPoint:
+          type: number
+          format: double
+          description: "Điểm đánh giá trung bình của danh sách phòng."
+          example: 4.7
+        ratingCount:
+          type: integer
+          description: "Số lượng đánh giá của danh sách phòng."
+          example: 25
+        reviews:
+          type: array
+          description: "Có thể trống."
+    ListingTypeResponse:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "Tên loại danh sách phòng."
+          example: "Villa"
+        description:
+          type: string
+          description: "Mô tả chi tiết về loại danh sách phòng."
+        imgSrc:
+          type: string
+          format: uri
+          description: "URL hình ảnh của loại danh sách phòng."
+          example: "http://example.com/villa.jpg"
+    ReviewResponse:
+      type: object
+      properties:
+        rating:
+          type: integer
+          description: "Điểm đánh giá cho danh sách phòng."
+          example: 5
+        listingId:
+          type: string
+          description: "ID của danh sách phòng mà đánh giá này liên quan đến."
+          example: "listing123"
+        content:
+          type: string
+          description: "Nội dung của đánh giá."
+          example: "Amazing place, would definitely stay again!"
+    ReviewRequest:
+      required:
+          - rating
+          - listingId
+          - content
+      type: object
+      properties:
+        rating:
+          type: integer
+          description: "Điểm đánh giá cho danh sách phòng."
+          example: 5
+        listingId:
+          type: string
+          description: "ID của danh sách phòng mà đánh giá này liên quan đến."
+          example: "listing123"
+        content:
+          type: string
+          description: "Nội dung của đánh giá."
+          example: "Amazing place, would definitely stay again!"
+    AddToWhishListRequest:
+      type: object
+      properties:
+        listingId:
+          type: string
+          description: "ID của danh sách phòng cần thêm vào danh sách yêu thích."
+          example: "listing123"
+      required:
+        - listingId
+      additionalProperties: false
+    RemoveFromWhishListRequest:
+      type: object
+      properties:
+        listingId:
+          type: string
+          description: "ID của danh sách phòng cần thêm vào danh sách yêu thích."
+          example: "listing123"
+      required:
+        - listingId
+      additionalProperties: false
+    RecentSearchResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: "ID của tìm kiếm gần đây."
+          example: "search123"
+        userId:
+          type: string
+          description: "ID của người dùng thực hiện tìm kiếm."
+          example: "user456"
+        recentSearchList:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecentSearchResult'
+          description: "Danh sách các kết quả tìm kiếm gần đây."
+      required:
+        - id
+        - userId
+        - recentSearchList
+      additionalProperties: false
+
+    RecentSearchResult:
+      type: object
+      properties:
+        city:
+          type: string
+          description: "Tên thành phố của tìm kiếm gần đây."
+          example: "Hanoi"
+        imgSrc:
+          type: string
+          description: "Ảnh liên quan đến tìm kiếm, có thể gọi từ khu vực."
+          example: "https://example.com/image.jpg"
+        guestsCount:
+          type: integer
+          description: "Số lượng khách trong tìm kiếm."
+          example: 2
+        checkinDate:
+          type: string
+          format: date-time
+          description: "Ngày nhận phòng (theo định dạng ISO 8601)."
+          example: "2024-09-01T15:00:00Z"
+        checkoutDate:
+          type: string
+          format: date-time
+          description: "Ngày trả phòng (theo định dạng ISO 8601)."
+          example: "2024-09-10T11:00:00Z"

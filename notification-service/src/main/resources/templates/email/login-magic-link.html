@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Xác minh và đăng nhập</title>
+  </head>
+
+  <body
+    style="margin: 0; font-family: Arial, sans-serif; background-color: #f6f6f6"
+  >
+    <div
+      style="
+        background-color: #ffffff;
+        border: 1px solid #dddddd;
+        height: 100vh;
+      "
+    >
+      <div style="background-color: #003580; padding: 20px">
+        <div style="width: 580px; margin: auto">
+          <a  th:href="@{${webUrl}}" style="color: white; font-weight: 700; font-size: 22px;">
+            Booking.com
+          </a>
+        </div>
+      </div>
+      <div style="width: 580px; margin: auto; font-size: 14px; color: #333">
+        <h2 style="color: #333333">Xác minh và đăng nhập</h2>
+        <span>Chào bạn,</span>
+        <p>
+          Xác minh bản thân dưới đây để đăng nhập vào tài khoản Booking.com của
+          bạn cho
+          <span
+            style="color: #1155cc; text-decoration: underline; font-weight: 600"
+            >numberzero@gmail.com</span
+          >.
+        </p>
+        <p>
+          Đường dẫn chỉ có thể được sử dụng một lần và sẽ hết hạn sau 10 phút
+          nếu bạn không sử dụng.
+        </p>
+        <div style="padding-top: 16px">
+          <a
+            th:href="@{${loginMagicLink}}"
+            style="
+              background-color: #0071c2;
+              color: #ffffff;
+              padding: 10px 64px;
+              text-decoration: none;
+              border-radius: 5px;
+              font-size: 14px;
+            "
+            >Xác minh</a
+          >
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
