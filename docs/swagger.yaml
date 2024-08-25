@@ -514,9 +514,12 @@ components:
     AuthenticationResponse:
        type: object
        properties:
-        token:
+        accessToken:
           type: string
-          example: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJudW1iZXJ6ZXJvMDkwOUBnbWFpbC5jb20iLCJzY29wZSI6IlJPTEVfQURNSU4g(rất dài)
+          example: eyJhbGciOiJIUzUxMiJ9...
+        refreshToken:
+          type: string
+          example: eyJhbGciOiJIUzUxMiJ...
         isAuthenticated:
           type: boolean
           example: true

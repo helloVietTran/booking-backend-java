@@ -21,8 +21,8 @@ spring:
 
 jwt:
   secretKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
-  access-duration: 360000  # in second
-  refreshable-duration: 36000 # in seconds
+  access-duration: 3600  # in second
+  refreshable-duration: 86400 # in seconds
 app:
   services:
     profile: "http://localhost:8081/profile"

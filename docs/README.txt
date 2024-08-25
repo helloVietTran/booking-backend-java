@@ -34,5 +34,5 @@
         📢: Áp dụng cho có NHIỀU kết quả trả về schemas ListingResponse
         📢: nếu tên operationID CÓ CHỮ ByPage thì dùng cấu trúc PageResponse<T> 
 
-        
+
 

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
@@ -19,12 +20,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     private final String[] PUBLIC_ENDPOINTS = {
-        "/new-listing", "/my/delete/{listingId}", "/{listingId}", "/my/listing/image", "/",// endpoint for group
-        "/listing-type", "/listing-type/{listingTypeId}", 
+        "/{listingId}",
+        "/search", 
         "/region",
-        "/review", "/review/{reviewId}", "/review/{listingId}/all-posts", "/review/my-review-post",
-        "/search", "/search/recent-search",
-        "/whish-list", "/whish-list/add", "/whish-list/remove",
+        "/review/{reviewId}",
         "/statistic/by-region",
     };
     
@@ -34,7 +33,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(request -> request
-                                    .requestMatchers(PUBLIC_ENDPOINTS)
+                                    .requestMatchers(HttpMethod.GET,PUBLIC_ENDPOINTS)
                                     .permitAll()
                                     .anyRequest()
                                     .authenticated()); 

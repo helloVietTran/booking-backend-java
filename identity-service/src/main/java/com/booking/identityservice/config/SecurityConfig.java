@@ -4,6 +4,7 @@ package com.booking.identityservice.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,9 +21,7 @@ public class SecurityConfig {
 
     private final String[] PUBLIC_ENDPOINTS = {
         "/auth/login", "/auth/introspect", "/auth/logout", "/auth/refresh", "/auth/send-link-login","/auth/verify-login-link",
-        "/users/reset-password", "/users/my-info", "/users/registration", "/users/{userId}", "/users/my", "/users/change-password",
-        "/roles", "/roles/{role}",
-        "/permissions", "/permissions/{/permission}"
+        "/users/reset-password", "/users/change-password", "/users/registration", "/users/{userId}", 
     };
       
     @Autowired
@@ -30,7 +29,11 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeHttpRequests(request -> request.requestMatchers(PUBLIC_ENDPOINTS)
+        httpSecurity.authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.GET,PUBLIC_ENDPOINTS)
+                                                             .permitAll()
+                                                             .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
+                                                             .permitAll()
+                                                             .requestMatchers(HttpMethod.PATCH, PUBLIC_ENDPOINTS)
                                                              .permitAll()
                                                              .anyRequest()
                                                              .authenticated());

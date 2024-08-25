@@ -1,3 +1,19 @@
+📢 khi đăng nhập thành công sẽ trả về 2 loại token: access token và refresh token.
+  - access token luôn được gửi cùng request cần xác thực như thêm sửa xóa phòng.
+  - refresh token chỉ được dùng duy nhất để `POST` lên `api/identity/auth/refresh` lấy access token mới.
+## Luồng chạy như sau:
+1.  request số 1 + access token còn hạn -> thành công, không có vấn đề, dừng lại luồng này.
+2.  request tiếp theo (đặt là số 2) + access token HẾT HẠN -> chưa dừng ngay
+
+3.  dùng interceptor của axios để gửi thêm 1 request nữa sau khi đã thất bại, đó là gửi refresh token 
+    lên `POST api/identity/auth/refresh`
+4.  nếu refresh token còn sống thì server sẽ trả về access token mới
+
+5.  lấy access token mới lưu cookie và thử lại request số 2
+6.  nếu bị lỗi nữa mới chính thức thất bại
+
+
+
 # Use Case: Đăng Nhập Người Dùng 📌
 ## Mô tả: 
 Đăng nhập người dùng
@@ -27,7 +43,7 @@
 ## Luồng phụ
 1. Trả về 401-UNAUTHORIZED nếu token hết hạn
 
-// cần xem lại
+
 # Use Case: Làm Mới Access Token 📌
 ## Mô tả: 
 Khi accessToken hết hạn gửi tới endpoint này để làm mới

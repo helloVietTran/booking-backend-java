@@ -37,15 +37,13 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     @NonFinal
     private String[] publicEndpoint = {
             "/identity/auth/login", "/identity/auth/introspect", "/identity/auth/refresh", "/identity/auth/logout",
-            "/identity/auth/send-link-login", "/identity/auth/verify-login-link",
-            "/identity/users/reset-password", "/identity/users/my-info", "/identity/users/registration",
-            "identity/users/{userId}",
-            "/identity/users/my", "/identity/users/change-password",
-            "/listing/new-listing", "/listing/my/delete/{listingId}", "/listing/{listingId}",
-            "/listing/my/listing/image","/listing", "/listing/listing-type","/listing/listing-type/{listingTypeId}",
-            "/listing/region", "/listing/review", "/listing/review/{reviewId}", "/listing/review/{listingId}/all-posts",
-            "/listing/review/my-review-post", "/listing/search", "/listing/search/recent-search",
-            "/listing/whish-list", "/listing/whish-list/add","/listing/whish-list/remove",
+            "/identity/auth/send-link-login","/identity/auth/verify-login-link",
+
+            "/identity/users/reset-password", "/identity/users/registration", "identity/users/{userId}",
+            /* "/identity/users/change-password",*/
+
+            "/listing/{listingId}", "/listing/my/listing/image","/listing", "/listing/listing-type", 
+            "/listing/region", "/listing/review/{reviewId}", "/listing/search", 
     };
 
     @NonFinal
@@ -69,10 +67,8 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
                 return chain.filter(exchange);
             else
                 return unauthenticated(exchange.getResponse());
-        }).onErrorResume(throwable -> unauthenticated(exchange.getResponse()));// các lỗi 500 cũng trả về
-                                                                               // unauthenticated
-
-        // return chain.filter(exchange);
+        }).onErrorResume(throwable -> unauthenticated(exchange.getResponse()));// các lỗi 500 cũng trả về unauthenticated
+                                                                               
     }
 
     @Override
@@ -82,7 +78,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
     private boolean isPublicEndpoint(ServerHttpRequest request) {
         return Arrays.stream(publicEndpoint)
-                .anyMatch(s -> request.getURI().getPath().matches(apiPrefix + s));// không dùng stream thì dùng foreach
+                .anyMatch(s -> request.getURI().getPath().matches(apiPrefix + s));
 
     }
 
