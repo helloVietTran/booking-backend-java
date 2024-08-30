@@ -1,6 +1,6 @@
 package com.booking.profileservice.entity;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
@@ -8,7 +8,7 @@ import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Property;
 import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
 
-import com.booking.profileservice.enums.Gender;
+import com.booking.profileservice.enums.GenderEnum;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -42,6 +42,6 @@ public class UserProfile {
     String postalCode;
     String phoneNumber;
     
-    LocalDateTime dayOfBirth;
-    Gender gender;
+    Instant dayOfBirth;
+    GenderEnum gender;
 }

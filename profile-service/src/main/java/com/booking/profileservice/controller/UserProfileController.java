@@ -24,7 +24,7 @@ public class UserProfileController {
 
     UserProfileService userProfileService;
 
-    @PostMapping("/create")
+    @PostMapping("/new-user-profile")
     UserProfileResponse createProfile(@RequestBody UserProfileCreationRequest request){
         return userProfileService.createProfile(request);
     }
@@ -60,11 +60,19 @@ public class UserProfileController {
         return ApiResponse.<String>builder().result("Update avatar sucessfull").build();
     }
     
-    @PatchMapping("/{userId}")
+    @GetMapping("/user/{userId}")
     ApiResponse<UserProfileResponse> getUserProfileByUserId(@PathVariable String userId){
 
         return ApiResponse.<UserProfileResponse>builder()
                         .result(userProfileService.getUserProfileByUserId(userId))
+                        .build();
+    }
+
+    @GetMapping("/my-profile")
+    ApiResponse<UserProfileResponse> getMyProfile(@PathVariable String userId){
+
+        return ApiResponse.<UserProfileResponse>builder()
+                        .result(userProfileService.getMyProfile())
                         .build();
     }
 }

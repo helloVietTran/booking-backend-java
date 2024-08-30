@@ -2,7 +2,6 @@ package com.booking.identityservice.service;
 
 import java.text.ParseException;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -27,18 +25,23 @@ import com.booking.identityservice.dto.request.IntrospectRequest;
 import com.booking.identityservice.dto.request.LogoutRequest;
 import com.booking.identityservice.dto.request.RefreshRequest;
 import com.booking.identityservice.dto.request.SendLinkLoginRequest;
+import com.booking.identityservice.dto.request.SendLinkVerifyAccountRequest;
+import com.booking.identityservice.dto.request.VerifyAccountLinkRequest;
 import com.booking.identityservice.dto.request.VerifyLoginLinkRequest;
 import com.booking.identityservice.dto.response.AuthenticationResponse;
 import com.booking.identityservice.dto.response.IntrospectResponse;
+import com.booking.identityservice.dto.response.UserResponse;
 import com.booking.identityservice.entity.DisabledToken;
 import com.booking.identityservice.entity.MagicLinkToken;
 import com.booking.identityservice.entity.User;
+import com.booking.identityservice.entity.VerifyAccountToken;
 import com.booking.identityservice.exception.AppException;
 import com.booking.identityservice.exception.ErrorCode;
+import com.booking.identityservice.mapper.UserMapper;
 import com.booking.identityservice.repository.DisabledTokenRepository;
 import com.booking.identityservice.repository.MagicLinkTokenRepository;
 import com.booking.identityservice.repository.UserRepository;
-
+import com.booking.identityservice.repository.VerifyAccountTokenRepository;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -64,12 +67,20 @@ public class AuthenticationService {
     UserRepository userRepository;
     DisabledTokenRepository disabledTokenRepository;
     MagicLinkTokenRepository magicLinkTokenRepository;
+    VerifyAccountTokenRepository accountTokenRepository;
+
+    UserMapper userMapper;
+
     KafkaTemplate<String, Object> kafkaTemplate;
     PasswordEncoder passwordEncoder;
 
     @NonFinal
     @Value("${app.frontend.magicLinkUri}")
     String magicLinkUri;
+
+    @NonFinal
+    @Value("${app.frontend.verifyAccountUri}")
+    String verifyAccountUri;
 
     @NonFinal
     @Value("${jwt.secretKey}")
@@ -82,6 +93,14 @@ public class AuthenticationService {
     @NonFinal
     @Value("${jwt.refreshable-duration}")
     protected long REFRESHABLE_DURATION;
+
+    @NonFinal
+    @Value("${app.topic.magicLoginLink}")
+    String magicLoginLinkTopic;
+
+    @NonFinal
+    @Value("${app.topic.verifyAccountLink}")
+    String verifyAccountLinkTopic;
 
     String getUserIdFromToken() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -108,7 +127,6 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         var user = userRepository
                 .findByEmail(request.getEmail())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
@@ -153,15 +171,15 @@ public class AuthenticationService {
         var accessToken = generateToken(user, false);
 
         return AuthenticationResponse.builder()
-                        .accessToken(accessToken)
-                        .isAuthenticated(true)
-                        .build();
+                .accessToken(accessToken)
+                .isAuthenticated(true)
+                .build();
     }
 
-    private String generateToken(User user, boolean isRefresh) {
+    public String generateToken(User user, boolean isRefresh) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
         Long duration = ACCESS_DURATION;
-        if(isRefresh){
+        if (isRefresh) {
             duration = REFRESHABLE_DURATION;
         }
 
@@ -174,6 +192,7 @@ public class AuthenticationService {
                 .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(user))
                 .claim("id", user.getId())
+                .claim("isVerified", user.getIsVerified())
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
@@ -188,6 +207,7 @@ public class AuthenticationService {
             throw new RuntimeException(e);
         }
     }
+
     public void sendLinkLogin(SendLinkLoginRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new AppException(ErrorCode.USER_NOT_EXISTED);
@@ -207,18 +227,12 @@ public class AuthenticationService {
         Map<String, Object> params = new HashMap<>();
         params.put("subject", "Đường dẫn xác minh");
         params.put("loginMagicLink", loginMagicLink);
-
-        NotificationEvent notificationEvent = NotificationEvent.builder()
-                .channel("EMAIL")
-                .receiver(request.getEmail())
-                .templateCode("login-magic-link")
-                .params(params)
-                .build();
-        kafkaTemplate.send("notification-login-magic-link", notificationEvent);
+    
+        sendNotificationEvent(magicLoginLinkTopic, params, request.getEmail(), "login-magic-link");
     }
 
     public AuthenticationResponse verifyLoginLink(VerifyLoginLinkRequest request) {
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now();
 
         Optional<MagicLinkToken> optionalToken = magicLinkTokenRepository
                 .findFirstByEmailAndExpiryDateBefore(request.getEmail(), now);
@@ -228,7 +242,7 @@ public class AuthenticationService {
         }
         MagicLinkToken magicLinkToken = optionalToken.get();
 
-        if (isValidMagicToken(request.getToken(), magicLinkToken))
+        if (isValidToken(request.getToken(), magicLinkToken.getToken()))
             throw new AppException(ErrorCode.INVALID_TOKEN);
 
         Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
@@ -246,6 +260,51 @@ public class AuthenticationService {
                 .build();
     }
 
+    public void sendLinkVerifyAccount(SendLinkVerifyAccountRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
+        }
+        String token = UUID.randomUUID().toString();
+        String hashToken = passwordEncoder.encode(token);
+
+        VerifyAccountToken verifyAccountToken = VerifyAccountToken.builder()
+                .email(request.getEmail())
+                .token(hashToken)
+                .build();
+        accountTokenRepository.save(verifyAccountToken);
+
+        String verifyAccountLink = verifyAccountUri + token;
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("subject", "Xác thực tài khoản của bạn");
+        params.put("verifyAccountLink", verifyAccountLink);
+
+        sendNotificationEvent(verifyAccountLinkTopic, params, request.getEmail(), "verify-account-link");
+
+    }
+
+    public UserResponse verifyAccountLink(VerifyAccountLinkRequest request) {
+
+        Optional<VerifyAccountToken> optionalToken = accountTokenRepository
+                .findFirstByEmailAndExpiryDateBefore(request.getEmail(), Instant.now());
+
+        if (!optionalToken.isPresent()) {
+            throw new AppException(ErrorCode.INVALID_TOKEN);
+        }
+        VerifyAccountToken verifyAccountToken = optionalToken.get();
+
+        if (isValidToken(request.getToken(), verifyAccountToken.getToken()))
+            throw new AppException(ErrorCode.INVALID_TOKEN);
+
+        Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
+        if (!optionalUser.isPresent()) {
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
+        }
+        User user = optionalUser.get();
+        user.setIsVerified(true);
+
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
 
     private SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException {
         JWSVerifier verifier = new MACVerifier(SECRET_KEY.getBytes());
@@ -281,11 +340,18 @@ public class AuthenticationService {
         return stringJoiner.toString();
     }
 
-    
-    private boolean isValidMagicToken(String token, MagicLinkToken magicLinkToken) {
-        // LocalDateTime now = LocalDateTime.now();
-        // !magicLinkToken.getExpiryDate().isBefore(now)&&
+    private void sendNotificationEvent(String topic, Map<String, Object> params, String email, String templateCode) {
+        NotificationEvent notificationEvent = NotificationEvent.builder()
+                .channel("EMAIL")
+                .receiver(email)
+                .templateCode(templateCode)
+                .params(params)
+                .build();
 
-        return passwordEncoder.matches(token, magicLinkToken.getToken());
+        kafkaTemplate.send(topic, notificationEvent);
+    }
+
+    private boolean isValidToken(String token,  String hashToken) {
+        return passwordEncoder.matches(token, hashToken);
     }
 }

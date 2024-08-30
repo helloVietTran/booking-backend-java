@@ -7,8 +7,6 @@ import org.springframework.stereotype.Repository;
 
 import com.booking.identityservice.entity.User;
 
-
-
 @Repository
 public interface UserRepository extends JpaRepository<User, String> {
     boolean existsByEmail(String email);

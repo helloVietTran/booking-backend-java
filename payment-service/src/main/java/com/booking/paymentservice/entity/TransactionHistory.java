@@ -1,6 +1,6 @@
 package com.booking.paymentservice.entity;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-public class CoinTransaction {
+public class TransactionHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
@@ -21,14 +21,19 @@ public class CoinTransaction {
 
     String reservationId;
 
-    String amount;
-    String transactionType;
+    String recipientId;
+
+    String amount;// tiền
+
     String description;
 
-    LocalDateTime  transactionDate;
+    Instant transactionDate;
+    String status;
+
+    String paymentMethod;// chuyển khoản hoặc nhận tiền
 
     @PrePersist
     public void onCreate() {
-        transactionDate = LocalDateTime.now();       
+        transactionDate = Instant.now();       
     }
 }

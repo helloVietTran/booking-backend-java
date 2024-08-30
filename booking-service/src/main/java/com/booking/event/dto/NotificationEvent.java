@@ -16,4 +16,3 @@ public class NotificationEvent {
     String templateCode;
     Map<String, Object> params;
 }
-

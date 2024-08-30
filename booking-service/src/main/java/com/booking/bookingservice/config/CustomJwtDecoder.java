@@ -1,8 +1,8 @@
 package com.booking.bookingservice.config;
 
+
 import java.text.ParseException;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
@@ -12,8 +12,6 @@ import com.nimbusds.jwt.SignedJWT;
 
 @Component
 public class CustomJwtDecoder implements JwtDecoder {
-    @Value("${jwt.secretKey}")
-    private String secretKey;
 
     @Override
     public Jwt decode(String token) throws JwtException {

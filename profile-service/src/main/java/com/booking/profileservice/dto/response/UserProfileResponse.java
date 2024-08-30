@@ -1,9 +1,8 @@
 package com.booking.profileservice.dto.response;
 
+import java.time.Instant;
 
-import java.time.LocalDateTime;
-
-import com.booking.profileservice.enums.Gender;
+import com.booking.profileservice.enums.GenderEnum;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -26,6 +25,6 @@ public class UserProfileResponse {
     
     String phoneNumber;
     
-    LocalDateTime dayOfBirth;
-    Gender gender;
+    Instant dayOfBirth;
+    GenderEnum gender;
 }

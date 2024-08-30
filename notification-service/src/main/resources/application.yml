@@ -19,9 +19,10 @@ spring:
             properties:
                 spring.json.trusted.packages: "*"
 
-brevo:
-    apiKey: "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"
-    url: https://api.brevo.com
-
-web:
-    url: http://localhost:3000
+app:
+    brevo:
+        apiKey: <brevo_key>
+        url: https://api.brevo.com
+    frontend:
+        url: http://localhost:3000
+        

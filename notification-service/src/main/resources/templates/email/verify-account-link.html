@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Xác thực tài khoản</title>
+  </head>
+
+  <body
+    style="margin: 0; font-family: Arial, sans-serif; background-color: #f6f6f6"
+  >
+    <div
+      style="
+        background-color: #ffffff;
+        border: 1px solid #dddddd;
+        height: 100vh;
+      "
+    >
+      <div style="background-color: #003580; padding: 20px">
+        <div style="width: 580px; margin: auto">
+          <a
+            th:href="@{${frontendUrl}}"
+            style="color: white; font-weight: 700; font-size: 22px;"
+          >
+            Booking.com
+          </a>
+        </div>
+      </div>
+      <div style="width: 580px; margin: auto; font-size: 14px; color: #333">
+        <h2 style="color: #333333">Xác thực tài khoản</h2>
+        <span>Chào bạn,</span>
+        <p>
+          Cảm ơn bạn đã đăng ký tài khoản tại Booking.com! Vui lòng xác thực
+          tài khoản của bạn bằng cách nhấp vào liên kết dưới đây:
+        </p>
+        <div style="padding-top: 16px">
+          <a
+            th:href="@{${verifyAccountLink}}"
+            style="
+              background-color: #0071c2;
+              color: #ffffff;
+              padding: 10px 64px;
+              text-decoration: none;
+              border-radius: 5px;
+              font-size: 14px;
+            "
+            >Xác thực tài khoản</a
+          >
+        </div>
+        <p>
+          Liên kết xác thực sẽ hết hạn sau 1 giờ.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

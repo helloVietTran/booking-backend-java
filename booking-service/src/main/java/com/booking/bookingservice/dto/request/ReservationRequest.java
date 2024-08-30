@@ -1,6 +1,6 @@
 package com.booking.bookingservice.dto.request;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -19,19 +19,14 @@ public class ReservationRequest {
     @NotNull(message = "LISTINGID_REQUIRED")
     String listingId;
 
-    String guestName;
-    
-    @NotNull(message = "PHONE_NUMBER_REQUIRED")
-    String phoneNumber;
-
     @NotNull(message = "CHECKIN_DATE_REQUIRED")
-    LocalDateTime checkInDate;
+    Instant checkInDate;
     @NotNull(message = "CHECKOUT_DATE_REQUIRED")
-    LocalDateTime checkOutDate;
+    Instant checkOutDate;
 
     Integer adultCount;
     Integer childrenCount;
     
     @NotNull(message = "PRICE_REQUIRED")
-    String totalPrice;
+    Double totalPrice;
 }

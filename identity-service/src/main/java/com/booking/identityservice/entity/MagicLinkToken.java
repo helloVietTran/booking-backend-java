@@ -1,7 +1,6 @@
 package com.booking.identityservice.entity;
 
-
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,12 +25,12 @@ public class MagicLinkToken {
     String email;
     String token;
 
-    LocalDateTime expiryDate;
+    Instant expiryDate;
 
     @PrePersist
     public void onPersist(){
         if(expiryDate == null){
-            expiryDate = LocalDateTime.now().plusMinutes(10);
+            expiryDate = Instant.now().plusSeconds(360);
         }
     }
 }

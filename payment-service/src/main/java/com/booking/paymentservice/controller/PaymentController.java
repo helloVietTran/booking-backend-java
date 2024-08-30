@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.booking.paymentservice.dto.ApiResponse;
-import com.booking.paymentservice.dto.request.WalletCreationRequest;
-import com.booking.paymentservice.dto.response.WalletResponse;
+import com.booking.paymentservice.dto.request.OrderRequest;
+import com.booking.paymentservice.dto.response.OrderResponse;
 import com.booking.paymentservice.service.PaymentService;
 
 import lombok.AccessLevel;
@@ -19,12 +19,11 @@ import lombok.experimental.FieldDefaults;
 public class PaymentController {
     PaymentService paymentService;
 
-    @PostMapping("/coin-wallet")
-    
-    ApiResponse<WalletResponse> createWallet(@RequestBody WalletCreationRequest request){
-        return ApiResponse.<WalletResponse>builder()
-                        .result(paymentService.createWallet(request))
-                        .build();
+    @PostMapping("/new-order")
+    ApiResponse<OrderResponse> createOrder(@RequestBody OrderRequest request){
+        return ApiResponse.<OrderResponse>builder()
+            .result(paymentService.createOrder(request))
+            .build();
     }
 
     

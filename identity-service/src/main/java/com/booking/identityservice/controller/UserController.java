@@ -67,7 +67,7 @@ public class UserController {
 
     @PostMapping("/reset-password")
     ApiResponse<String> resetPassword(){
-        userService.resetPassword("reset-password");
+        userService.resetPassword();
         return ApiResponse.<String>builder()
                           .result("Reset password link has send")
                           .build();

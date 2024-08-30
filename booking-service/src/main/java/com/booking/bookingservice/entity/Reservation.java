@@ -1,7 +1,7 @@
 package com.booking.bookingservice.entity;
 
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import com.booking.bookingservice.enums.PaymentStatus;
 import com.booking.bookingservice.enums.ReservationStatus;
@@ -24,40 +24,38 @@ public class Reservation {
 
     String renterId;// id người thuê nhà, được xác định qua token
     String listingId;// id nhà
-
-    String guestName;
-    String phoneNumber;
     
-    LocalDateTime checkInDate;
-    LocalDateTime checkOutDate;
+    Instant checkInDate;
+    Instant checkOutDate;
+
     Integer adultCount;
     Integer childrenCount;
-    String totalPrice;
+    Double totalPrice;
     
     @Builder.Default
-    ReservationStatus status = ReservationStatus.PENDING;// mặc định là đang chờ xác nhận
+    ReservationStatus status = ReservationStatus.PENDING;
 
     @Builder.Default
     PaymentStatus paymentStatus = PaymentStatus.UNPAID;
 
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
+    Instant createdAt;
+    Instant updatedAt;
 
     // trường này để đánh dấu người dùng đã hoàn thành quá trình thuê phòng
     // được gọi từ review service, chỉ cho phép review khi người dùng đó thuê xong
     @Builder.Default
     boolean hasCheckout = false;
 
-    LocalDateTime checkoutAt;
+    Instant checkoutAt;
 
     @PrePersist
     public void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
+        createdAt = Instant.now();
+        updatedAt = Instant.now();
     }
 
     @PreUpdate 
     public void onUpdate(){
-        updatedAt = LocalDateTime.now();
+        updatedAt = Instant.now();
     }
 }

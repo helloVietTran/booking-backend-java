@@ -1,6 +1,6 @@
 package com.booking.bookingservice.entity;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,12 +26,12 @@ public class ConfirmReservationToken {
     
     String token;
 
-    LocalDateTime expiryDate;
+    Instant expiryDate;
 
     @PrePersist
     public void onPersist(){
         if(expiryDate == null){
-            expiryDate = LocalDateTime.now().plusDays(1);
+            expiryDate = Instant.now().plusDays(1);
         }
     }
     

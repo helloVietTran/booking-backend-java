@@ -20,8 +20,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     private final String[] PUBLIC_ENDPOINTS = {
-        "/listing/upload", "/listing/my/delete/{publicId}", "/avatar/upload","/avatar/my/delete/{publicId}",
-        "/avatar/form"
     };
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
@@ -29,12 +27,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(request -> request
-              /* .requestMatchers(PUBLIC_ENDPOINTS)
+               .requestMatchers(PUBLIC_ENDPOINTS)
                 .permitAll()
                 .anyRequest()
-                .authenticated());*/
-                .anyRequest()
-                .permitAll());
+                .authenticated());
+                
 
         httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
                         .decoder(customJwtDecoder)
@@ -54,7 +51,7 @@ public class SecurityConfig {
         corsConfiguration.setAllowedHeaders(List.of("*")); 
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", corsConfiguration);// đăng kí cấu hình cho mọi url
+        source.registerCorsConfiguration("/**", corsConfiguration);
 
         return source;
     }

@@ -2,7 +2,7 @@ package com.booking.profileservice.dto.request;
 
 import java.time.LocalDateTime;
 
-import com.booking.profileservice.enums.Gender;
+import com.booking.profileservice.enums.GenderEnum;
 
 public class UpdateProfileRequest {
     
@@ -15,5 +15,5 @@ public class UpdateProfileRequest {
     String postalCode;
     
     LocalDateTime dayOfBirth;
-    Gender gender;
+    GenderEnum gender;
 }

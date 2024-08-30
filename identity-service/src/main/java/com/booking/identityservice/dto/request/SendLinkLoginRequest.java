@@ -10,6 +10,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SendLinkLoginRequest {
-    @Email
+    @Email(message = "EMAIL_NOT_VALID")
     String email;
 }

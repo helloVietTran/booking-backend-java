@@ -27,8 +27,8 @@
           "
         >
           <a
-            th:href="@{${webUrl}}"
-            style="color: white; font-weight: 700; font-size: 22px"
+            th:href="@{${frontendUrl}}"
+            style="color: white; font-weight: 700; font-size: 22px; cursor: pointer"
           >
             Booking.com
           </a>
@@ -50,7 +50,7 @@
           bạn làm điều đó
         </p>
         <a
-          th:href="@{${webUrl}}"
+          th:href="@{${frontendUrl}}"
           style="
             background-color: #0071c2;
             color: #ffffff;
@@ -59,10 +59,44 @@
             border-radius: 5px;
             font-size: 14px;
             display: block;
-            text-align: center
+            text-align: center;
+            margin-bottom: 16px;
+            cursor: pointer;
           "
           >Khám phá ngay</a
         >
+        <div
+          style="
+            border: 1px solid #ddd;
+            padding: 12px 16px;
+			border-radius: 4px;
+            font-family: Arial, sans-serif;
+          "
+        >
+          <h2 style="font-size: 14px; font-weight: bold">
+            Your account details
+          </h2>
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              padding:8px 0
+            "
+          >
+            <div style="color: #6b6b6b">Email address</div>
+            <div >
+              <a
+                href="mailto:${email}"
+                style="text-decoration: underline; color: #1155cc"
+                >${email}</a
+              >
+            </div>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding:8px 0">
+            <div style="color: #6b6b6b">Creation date</div>
+            <div>${createdAt}</div>
+          </div>
+        </div>
       </div>
     </div>
   </body>

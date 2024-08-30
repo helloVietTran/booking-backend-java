@@ -32,6 +32,8 @@ public class UserProfileService {
     UserProfileRepository userProfileRepository;
     UserProfileMapper userProfileMapper;
 
+    TokenService tokenService;
+
     String getUserIdFromToken() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -90,8 +92,21 @@ public class UserProfileService {
         userProfileRepository.save(userProfile);
     }
 
-    // nhận lấy user bằng user id
+
     public UserProfileResponse getUserProfileByUserId(String userId){
+        Optional<UserProfile> profileOptional = userProfileRepository.findByUserId(userId);
+
+        if (!profileOptional.isPresent()) {
+            throw new AppException(ErrorCode.USER_PROFILE_NOT_EXISTED);
+        }
+
+        UserProfile userProfile = profileOptional.get();
+
+        return userProfileMapper.toUserProfileResponse(userProfile);
+    }
+
+    public UserProfileResponse getMyProfile(){
+        String userId = tokenService.getUserIdFromToken();
         Optional<UserProfile> profileOptional = userProfileRepository.findByUserId(userId);
 
         if (!profileOptional.isPresent()) {

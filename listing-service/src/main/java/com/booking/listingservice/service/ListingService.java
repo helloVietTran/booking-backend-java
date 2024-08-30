@@ -44,9 +44,10 @@ public class ListingService {
 
     MongoTemplate mongoTemplate;
 
-
     public ListingResponse createListing(ListingCreationRequest request){
-
+        if(tokenService.isVerifedUser()){
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+        }
         ListingType listingType = listingTypeRepository.findById(request.getListingTypeId())
                                 .orElseThrow(()-> new AppException(ErrorCode.LISTINGTYPE_NOT_FOUND));
         

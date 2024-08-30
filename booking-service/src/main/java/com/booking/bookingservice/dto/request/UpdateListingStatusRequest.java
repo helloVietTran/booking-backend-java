@@ -1,6 +1,6 @@
 package com.booking.bookingservice.dto.request;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import com.booking.bookingservice.enums.ListingStatus;
 
@@ -22,6 +22,6 @@ public class UpdateListingStatusRequest {
     @Builder.Default
     ListingStatus status = ListingStatus.BOOKED;
 
-    LocalDateTime checkinDate;
-    LocalDateTime checkoutDate;
+    Instant checkinDate;
+    Instant checkoutDate;
 }

@@ -1,6 +1,6 @@
 package com.booking.identityservice.service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,6 +33,7 @@ import com.booking.identityservice.repository.ResetPasswordTokenRepository;
 import com.booking.identityservice.repository.RoleRepository;
 import com.booking.identityservice.repository.UserRepository;
 import com.booking.identityservice.repository.httpclient.ProfileClient;
+import com.booking.identityservice.utils.DateTimeFormatUtil;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -48,27 +48,39 @@ import lombok.extern.slf4j.Slf4j;
 public class UserService {
     UserRepository userRepository;
     RoleRepository roleRepository;
+    ResetPasswordTokenRepository resetPasswordTokenRepository;
+    DateTimeFormatUtil dateTimeFormatUtil;
+
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
     ProfileClient profileClient;
+
     KafkaTemplate<String, Object> kafkaTemplate;
-    ResetPasswordTokenRepository resetPasswordTokenRepository;
 
     @NonFinal
     @Value("${app.frontend.resetPasswordUri}")
     String resetPasswordUri;
 
+    @NonFinal
+    @Value("${app.topic.welcomEmail}")
+    String welcomEmailTopic;
+
+    @NonFinal
+    @Value("${app.topic.resetPasswordLink}")
+    String resetPasswordLinkTopic;
+
     public UserResponse createUser(UserCreationRequest request) {
-        User user = userMapper.toUser(request);
+        Optional<User> userOptional = userRepository.findByEmail(request.getEmail());
+        // nếu user không tồn tại hoặc user tồn tại rồi nhưng chưa có mật khẩu
+        if (!userOptional.isPresent() || (userOptional.isPresent() && userOptional.get().getPassword() == null)) {
 
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+            User user = userMapper.toUser(request);
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        HashSet<Role> roles = new HashSet<>();
-        roleRepository.findById("USER").ifPresent(roles::add);
+            HashSet<Role> roles = new HashSet<>();
+            roleRepository.findById("USER").ifPresent(roles::add);
 
-        user.setRoles(roles);
-
-        try {
+            user.setRoles(roles);
             user = userRepository.save(user);
 
             ProfileCreationRequest profileRequest = new ProfileCreationRequest();
@@ -78,36 +90,29 @@ public class UserService {
             Map<String, Object> params = new HashMap<>();
             params.put("subject", "Welcome to booking.com");
             params.put("createdAt", user.getCreatedAt());
+            params.put("userId", user.getId());
 
-            NotificationEvent notificationEvent = NotificationEvent.builder()
-                    .channel("EMAIL")
-                    .receiver(request.getEmail())
-                    .templateCode("welcome")
-                    .params(params)
-                    .build();
+            sendNotificationEvent(welcomEmailTopic, params, request.getEmail(), "welcome");
 
-            // publish kafka
-            kafkaTemplate.send("notification-registration", notificationEvent);// nhận 2 đối số topic và data
-
-        } catch (DataIntegrityViolationException exception) {
+            return userMapper.toUserResponse(user);
+        }else{
             throw new AppException(ErrorCode.USER_EXISTED);
         }
 
-        return userMapper.toUserResponse(user);
     }
 
     public UserResponse getMyInfo() {
         var context = SecurityContextHolder.getContext();
         String email = context.getAuthentication().getName();
-        log.info(email);
 
         User user = userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        return userMapper.toUserResponse(user);
+        UserResponse response = userMapper.toUserResponse(user);
+        response.setFormattedLastLoginAt(dateTimeFormatUtil.format(user.getLastLogin()));
+        return response;
     }
 
-    // name có thể là bất kì một trường nào trong User
-    @PostAuthorize("returnObject.email == authentication.name") // khi không thỏa mãn thì không return về kết quả
+    @PostAuthorize("returnObject.email == authentication.name")
     public UserResponse updateUser(String userId, UserUpdateRequest request) {
         User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
@@ -140,13 +145,13 @@ public class UserService {
         return userRepository.findAll().stream().map(userMapper::toUserResponse).toList();
     }
 
-    @PreAuthorize("hasRole('ADMIN')") // trước khi method được gọi
+    @PreAuthorize("hasRole('ADMIN')")
     public UserResponse getUser(String id) {
         return userMapper.toUserResponse(
                 userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));
     }
 
-    public void resetPassword(String templateCode) {
+    public void resetPassword() {
         var context = SecurityContextHolder.getContext();
         String email = context.getAuthentication().getName();
 
@@ -163,33 +168,27 @@ public class UserService {
 
         Map<String, Object> params = new HashMap<>();
         params.put("subject", "Yêu cầu thiết lập lại mật khẩu");
-        params.put("imageUrl", "");
         params.put("resetLink", resetPasswordLink);
 
-        NotificationEvent notificationEvent = NotificationEvent.builder()
-                .channel("EMAIL")
-                .receiver(email)
-                .params(params)
-                .templateCode(templateCode)
-                .build();
-        kafkaTemplate.send("notification-reset-password-link", notificationEvent);
+        sendNotificationEvent(resetPasswordLinkTopic, params, email, "reset-password");
     }
 
-    @Transactional 
+    @Transactional
     public void changePassword(ChangePasswordRequest request) {
         var context = SecurityContextHolder.getContext();
         String email = context.getAuthentication().getName();
 
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now();
 
-        Optional<ResetPasswordToken> optionalToken = resetPasswordTokenRepository.findFirstByEmailAndExpiryDateBefore(email, now);
-        if(!optionalToken.isPresent())
+        Optional<ResetPasswordToken> optionalToken = resetPasswordTokenRepository
+                .findFirstByEmailAndExpiryDateBefore(email, now);
+        if (!optionalToken.isPresent())
             throw new AppException(ErrorCode.RESET_TOKEN_NOT_EXISTED);
-        
+
         ResetPasswordToken resetPasswordToken = optionalToken.get();
-            
-        if(!isValidResetToken(request.getToken(), resetPasswordToken))
-                throw new AppException(ErrorCode.INVALID_TOKEN);
+
+        if (!isValidResetToken(request.getToken(), resetPasswordToken))
+            throw new AppException(ErrorCode.INVALID_TOKEN);
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
@@ -198,10 +197,20 @@ public class UserService {
 
     }
 
-    private boolean isValidResetToken(String token, ResetPasswordToken resetPasswordToken) {
-        //LocalDateTime now = LocalDateTime.now();
-        // !resetPasswordToken.getExpiryDate().isBefore(now) &&
+    private void sendNotificationEvent(String topic, Map<String, Object> params, String email, String templateCode) {
+        NotificationEvent notificationEvent = NotificationEvent.builder()
+                .channel("EMAIL")
+                .receiver(email)
+                .templateCode(templateCode)
+                .params(params)
+                .build();
 
-        return   passwordEncoder.matches(token, resetPasswordToken.getToken());
+        kafkaTemplate.send(topic, notificationEvent);
+    }
+
+    private boolean isValidResetToken(String token, ResetPasswordToken resetPasswordToken) {
+
+
+        return passwordEncoder.matches(token, resetPasswordToken.getToken());
     }
 }

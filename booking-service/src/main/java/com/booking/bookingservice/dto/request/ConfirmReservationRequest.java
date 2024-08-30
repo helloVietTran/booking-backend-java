@@ -1,5 +1,7 @@
 package com.booking.bookingservice.dto.request;
 
+import com.booking.bookingservice.enums.ReservationStatus;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +15,10 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ConfirmReservationRequest {
-    String token;
     String reservationId;
+    String token;
+
+    @Builder.Default
+    ReservationStatus status = ReservationStatus.CONFIRMED;
 }
+

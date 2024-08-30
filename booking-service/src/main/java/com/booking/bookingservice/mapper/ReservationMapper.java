@@ -8,7 +8,6 @@ import com.booking.bookingservice.dto.response.ReservationResponse;
 import com.booking.bookingservice.entity.Reservation;
 
 
-
 @Mapper(componentModel = "spring")
 public interface  ReservationMapper {
     Reservation toReservation(ReservationRequest request);

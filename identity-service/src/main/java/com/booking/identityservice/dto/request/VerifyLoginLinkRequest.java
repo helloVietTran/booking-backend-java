@@ -10,7 +10,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class VerifyLoginLinkRequest {
-    @Email
+    @Email(message = "EMAIL_NOT_VALID")
     String email;
     String token;
 }

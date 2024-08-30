@@ -9,12 +9,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.booking.identityservice.config.AuthenticationRequestInterceptor;
 import com.booking.identityservice.dto.request.ProfileCreationRequest;
+import com.booking.identityservice.dto.response.UserProfileResponse;
 
 @FeignClient(name="profile-service", url ="${app.services.profile}", configuration = {AuthenticationRequestInterceptor.class})
 public interface ProfileClient {
-    @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Object createProfile(@RequestBody ProfileCreationRequest request);
+    @PostMapping(value = "/new-user-profile", produces = MediaType.APPLICATION_JSON_VALUE)
+    public UserProfileResponse createProfile(@RequestBody ProfileCreationRequest request);
 
     @DeleteMapping(value = "/my/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public void deleteMyProfile(@PathVariable String userId);
+
 }

@@ -15,6 +15,7 @@ public enum ErrorCode {
     USER_NOT_EXISTED(1005, "User not existed", HttpStatus.NOT_FOUND),
     RESET_TOKEN_NOT_EXISTED(1008, "Reset token not existed", HttpStatus.UNAUTHORIZED),
     INVALID_TOKEN(1009, "Your token has beeb expired or wrong ", HttpStatus.BAD_REQUEST),
+    PROVIDER_NOT_FOUND(1010, "Provider not found", HttpStatus.NOT_FOUND),
 
     UNAUTHENTICATED(1900, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1901, "You do not have permission", HttpStatus.FORBIDDEN),

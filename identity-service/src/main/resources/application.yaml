@@ -18,6 +18,17 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: <client_id>
+            client-secret: <client_secret>
+          github:
+            client-id: <client_id>
+            client-secret: <client_id>
+
 
 jwt:
   secretKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
@@ -29,3 +40,9 @@ app:
   frontend:
     resetPasswordUri:  "http://localhost:8080/change-password?token="
     magicLinkUri: "http://localhost:8080/magic-link?token="
+    verifyAccountUri: "http://localhost:8080/verify-account?token="
+  topic:
+    welcomEmail: welcomEmail-notifcation
+    resetPasswordLink: resetPasswordLink-notifcation
+    magicLoginLink: magicLoginLink-notifcation
+    verifyAccountLink: verifyAccountLink-notifcation

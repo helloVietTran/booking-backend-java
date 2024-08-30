@@ -20,7 +20,9 @@ public class UserResponse {
     String fullName;
     String displayName;
     Boolean isVerified;
-    Instant lastLogin;
+
+    String formattedLastLoginAt;
+
     Instant createdAt;
     Instant updatedAt;
 

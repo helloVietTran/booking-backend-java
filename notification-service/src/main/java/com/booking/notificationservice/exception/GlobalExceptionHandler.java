@@ -9,12 +9,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.booking.notificationservice.dto.ApiResponse;
 
-
-
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
-
 
     @ExceptionHandler(value = Exception.class)
     ResponseEntity<ApiResponse<?>> handlingRuntimeException(RuntimeException exception) {

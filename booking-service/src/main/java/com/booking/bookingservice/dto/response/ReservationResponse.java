@@ -1,6 +1,6 @@
 package com.booking.bookingservice.dto.response;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import com.booking.bookingservice.enums.ReservationStatus;
 import com.booking.bookingservice.enums.PaymentStatus;
@@ -23,16 +23,16 @@ public class ReservationResponse {
 
     Integer adultCount;
     Integer childrenCount;
-    String totalPrice;
+    Double totalPrice;
 
     ReservationStatus status;
     PaymentStatus paymentStatus;
      
-    LocalDateTime checkInDate;
-    LocalDateTime checkOutDate;
+    Instant checkInDate;
+    Instant checkOutDate;
 
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
+    Instant createdAt;
+    Instant updatedAt;
 
     boolean hasCheckout;
 }

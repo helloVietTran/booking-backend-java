@@ -20,8 +20,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class SecurityConfig {
 
     private final String[] PUBLIC_ENDPOINTS = {
-        "/users/create", "/auth/login", "/auth/introspect", "/auth/logout", "/auth/refresh",
-        "/users/reset-password", "/users/my-info"
     };
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
@@ -29,12 +27,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(request -> request
-                /* .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
+                .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
                 .permitAll()
                 .anyRequest()
-                .authenticated());*/
-                .anyRequest()
-                .permitAll());
+                .authenticated());
 
         httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
                         .decoder(customJwtDecoder)

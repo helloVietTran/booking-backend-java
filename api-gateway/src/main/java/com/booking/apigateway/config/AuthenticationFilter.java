@@ -44,6 +44,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
             "/listing/{listingId}", "/listing/my/listing/image","/listing", "/listing/listing-type", 
             "/listing/region", "/listing/review/{reviewId}", "/listing/search", 
+            "/identity/test/home", "/identity/test/user", "/identity/test/profile", "/identity/test/login",
     };
 
     @NonFinal

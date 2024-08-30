@@ -1,66 +1,33 @@
 package com.booking.notificationservice.controller;
 
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.booking.event.dto.NotificationEvent;
-import com.booking.notificationservice.dto.request.Receiver;
-import com.booking.notificationservice.dto.request.SendEmailRequest;
-import com.booking.notificationservice.service.EmailService;
+import com.booking.notificationservice.dto.ApiResponse;
+import com.booking.notificationservice.dto.response.AppNotificationResponse;
+import com.booking.notificationservice.dto.response.PageResponse;
+import com.booking.notificationservice.service.NotificationService;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
-@Component
+@RestController
 @RequiredArgsConstructor
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class NotificationController {
-    EmailService emailService;
-    
-    @KafkaListener(topics = "notification-registration")// thông báo consumer
-    public void listenNotificationRegistration(NotificationEvent message){// nhận được biến ở đây
-        emailService.sendWelcomeEmail(SendEmailRequest
-                                .builder()
-                                .to(Receiver.builder().email(message.getReceiver()).build())
-                                .templateCode(message.getTemplateCode())
-                                .params(message.getParams())
-                                .build());
-    }
 
-    @KafkaListener(topics= "notification-reset-password-link")
-    public void listenNotificationResetPasswordLink(NotificationEvent message){
-        
-        emailService.sendResetPasswordEmail(SendEmailRequest
-                                .builder()
-                                .to(Receiver.builder().email(message.getReceiver()).build())
-                                .params(message.getParams())
-                                .templateCode(message.getTemplateCode())
-                                .build());
-    }
+    NotificationService notificationService;
 
-    @KafkaListener(topics= "notification-login-magic-link")
-    public void listenNotificationLoginMagicLink(NotificationEvent message){
-    
-        emailService.sendLoginMagicLink(SendEmailRequest
-                                .builder()
-                                .to(Receiver.builder().email(message.getReceiver()).build())
-                                .params(message.getParams())
-                                .templateCode(message.getTemplateCode())
-                                .build());
+    @GetMapping("/my-notification")
+    ApiResponse<PageResponse<AppNotificationResponse>> getMyNotification(
+            @RequestParam(value = "page", required = true, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = true, defaultValue = "5") int size) {
+        return ApiResponse.<PageResponse<AppNotificationResponse>>builder()
+                .result(notificationService.getMyNotification(page, size))
+                .build();
     }
-
-    @KafkaListener(topics = "notification-listing-rental-approval")
-    public void listenNotificationListingRentalApproval(NotificationEvent message){
-    
-        emailService.sendListingRentalApprovalEmail(SendEmailRequest
-                                .builder()
-                                .to(Receiver.builder().email(message.getReceiver()).build())
-                                .params(message.getParams())
-                                .templateCode(message.getTemplateCode())
-                                .build());
-    }
-
 }

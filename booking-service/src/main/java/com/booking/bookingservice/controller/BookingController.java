@@ -31,9 +31,19 @@ public class BookingController {
                          .build();
     }
 
+    //
     @PatchMapping("/confirm")
     ApiResponse<String> confirmReservation(@RequestBody ConfirmReservationRequest request){
         bookingService.confirmReservation(request);
+
+        return ApiResponse.<String>builder()
+                         .result("Confirm reservation sucessfull")
+                         .build();
+    }
+
+    @PatchMapping("/deny")
+    ApiResponse<String> DenyReservation(@RequestBody DenyReservationRequest request){
+        bookingService.denyReservation(request);
 
         return ApiResponse.<String>builder()
                          .result("Confirm reservation sucessfull")

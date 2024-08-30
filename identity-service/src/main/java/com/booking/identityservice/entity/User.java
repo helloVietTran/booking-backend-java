@@ -42,8 +42,6 @@ public class User {
     Instant createdAt;
     Instant updatedAt;
 
-    Boolean mfaEnabled;
-
     @PrePersist
     public void onCreate() {
         createdAt = Instant.now();
@@ -55,5 +53,8 @@ public class User {
         updatedAt = Instant.now();
     }
 
+    /*  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    Set<UserAuthentication> authenticationMethods = new HashSet<>();*/
 }
 
