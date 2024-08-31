@@ -14,7 +14,7 @@ import com.booking.profileservice.dto.ApiResponse;
 public class GlobalExceptionHandler {
 
 
-    @ExceptionHandler(value = Exception.class)
+    @ExceptionHandler(value = RuntimeException.class)
     ResponseEntity<ApiResponse<?>> handlingRuntimeException(RuntimeException exception) {
         log.error("Exception: ", exception);
         ApiResponse<?> apiResponse = new ApiResponse<>();

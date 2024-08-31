@@ -1,0 +1,14 @@
+server:
+    port: 8083
+    servlet:
+        context-path: /listing
+
+spring:
+    data:
+        mongodb:
+            uri: mongodb+srv://root:root@cluster0.dslk0oo.mongodb.net/listing-database?retryWrites=true&w=majority
+            
+
+app:
+    services:
+        booking: http://localhost:8085

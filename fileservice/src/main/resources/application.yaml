@@ -1,0 +1,28 @@
+server:
+    port: 8084
+    servlet:
+      context-path: /files
+app:
+  cloudinary:
+    cloud-name: dlfrltm8x
+    api-key: 357454587825522
+    api-secret: wBBGGx44RolTSHoes5bsDWxmce4
+  
+  folder: 
+    listing-folder: booking_listing
+    avatar-folder: booking_avatar
+  services:
+    profile: "http://localhost:8081/profile"
+    listing: "http://localhost:8083/listing"
+
+spring:
+  datasource:
+    url: "jdbc:mysql://localhost:3306/identity"
+    driverClassName: "com.mysql.cj.jdbc.Driver"
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+

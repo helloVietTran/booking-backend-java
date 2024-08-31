@@ -148,10 +148,10 @@ public class AuthenticationService {
 
     public void logout(LogoutRequest request) throws ParseException, JOSEException {
         try {
-            var signToken = verifyToken(request.getToken(), true);
-
-            String jid = signToken.getJWTClaimsSet().getJWTID();
-            Date expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
+            var signAccessToken = verifyToken(request.getAccessToken(), true);
+            
+            String jid = signAccessToken.getJWTClaimsSet().getJWTID();
+            Date expiryTime = signAccessToken.getJWTClaimsSet().getExpirationTime();
 
             DisabledToken disabledToken = DisabledToken.builder().id(jid).expiryTime(expiryTime).build();
 

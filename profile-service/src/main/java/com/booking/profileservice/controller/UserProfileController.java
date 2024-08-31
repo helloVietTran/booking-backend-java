@@ -34,7 +34,7 @@ public class UserProfileController {
         return userProfileService.getProfile(profileId);
     }
 
-    @GetMapping("/users")
+    @GetMapping("/all-profile")
     ApiResponse<List<UserProfileResponse>> getAllProfiles(){
         return ApiResponse.<List<UserProfileResponse>>builder()
                         .result(userProfileService.getAllProfiles())
@@ -69,7 +69,7 @@ public class UserProfileController {
     }
 
     @GetMapping("/my-profile")
-    ApiResponse<UserProfileResponse> getMyProfile(@PathVariable String userId){
+    ApiResponse<UserProfileResponse> getMyProfile(){
 
         return ApiResponse.<UserProfileResponse>builder()
                         .result(userProfileService.getMyProfile())

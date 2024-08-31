@@ -23,9 +23,11 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 //import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 // @Slf4j
 public class UserProfileService {
@@ -107,6 +109,8 @@ public class UserProfileService {
 
     public UserProfileResponse getMyProfile(){
         String userId = tokenService.getUserIdFromToken();
+        log.info(userId);
+        
         Optional<UserProfile> profileOptional = userProfileRepository.findByUserId(userId);
 
         if (!profileOptional.isPresent()) {

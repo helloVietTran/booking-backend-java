@@ -24,10 +24,10 @@ spring:
         registration:
           google:
             client-id: <client_id>
-            client-secret: <client_secret>
+            client-secret: <secret_key>
           github:
             client-id: <client_id>
-            client-secret: <client_id>
+            client-secret: <secret_key>
 
 
 jwt:

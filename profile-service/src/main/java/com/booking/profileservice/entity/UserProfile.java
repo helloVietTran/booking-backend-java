@@ -33,8 +33,6 @@ public class UserProfile {
     @Property("userId")// thông thường mặc định tên trường trong java sẽ được ánh xạ y nguyên sang neo4j
     String userId;
 
-    String fullName;
-    String displayName;
     String imgSrc;
 
     String address;

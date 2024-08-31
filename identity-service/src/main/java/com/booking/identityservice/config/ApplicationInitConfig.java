@@ -8,10 +8,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.booking.identityservice.dto.request.ProfileCreationRequest;
 import com.booking.identityservice.entity.Role;
 import com.booking.identityservice.entity.User;
 import com.booking.identityservice.repository.RoleRepository;
 import com.booking.identityservice.repository.UserRepository;
+import com.booking.identityservice.repository.httpclient.ProfileClient;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,8 @@ public class ApplicationInitConfig {
 
     @NonFinal
     static final String ADMIN_PASSWORD = "admin";
+
+    ProfileClient profileClient;
 
     @Bean
     @ConditionalOnProperty(
@@ -62,9 +66,15 @@ public class ApplicationInitConfig {
                         .email(ADMIN_EMAIL)
                         .password(passwordEncoder.encode(ADMIN_PASSWORD))
                         .roles(roles)
+                        .isVerified(true)
                         .build();
+                
+                    ProfileCreationRequest profileRequest = new ProfileCreationRequest();
+                    profileRequest.setUserId(user.getId());
+                    profileClient.createProfile(profileRequest);
 
                 userRepository.save(user);
+
                 log.warn("admin user has been created with default password: admin, please change it");
             }
     

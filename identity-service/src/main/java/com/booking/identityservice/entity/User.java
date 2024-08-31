@@ -29,8 +29,8 @@ public class User {
     String fullName;
     String displayName;
 
-    @Column(columnDefinition = "boolean default false")
-    Boolean isVerified;
+    @Builder.Default
+    Boolean isVerified = false;
     
     @ManyToMany
     Set<Role> roles;

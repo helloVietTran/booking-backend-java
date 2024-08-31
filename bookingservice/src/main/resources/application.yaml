@@ -1,0 +1,41 @@
+server:
+    port: 8085
+    servlet: 
+     context-path: /booking
+     
+spring:
+  datasource:
+    url: "jdbc:mysql://localhost:3306/identity"
+    driverClassName: "com.mysql.cj.jdbc.Driver"
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  kafka:
+    bootstrap-servers: localhost:9094
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: booking-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+          spring.json.trusted.packages: "*"
+    
+app:
+  services:
+    listing: "http://localhost:8083/listing"
+    profile: "http://localhost:8081/profile"
+
+  templateCode:
+    bookingConfirmation: booking-confirmation-email
+    bookingApproval: booking-approval-email
+    bookingDeny: booking-deny-email
+  topic: 
+    bookingConfirmation: bookingConfirmation-notifcation
+    bookingApproval: bookingApproval-notifcation
+    bookingDeny: bookingDeny-notifcation

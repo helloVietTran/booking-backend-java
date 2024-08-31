@@ -81,7 +81,7 @@ public class AuthenticationController {
 
     }
 
-    @PostMapping("/verify-verify-account-link")
+    @PostMapping("/verify-account-link")
     ApiResponse<UserResponse> verifyAccountLink(@RequestBody VerifyAccountLinkRequest request) {
         return ApiResponse.<UserResponse>builder()
                 .result(authenticationService.verifyAccountLink(request))
